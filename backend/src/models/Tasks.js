@@ -26,6 +26,23 @@ const taskSchema = mongoose.Schema(
                   enum : ['low','medium','high'],
                   default : 'medium'
             },
+            assignedTo : {
+                  type : mongoose.Schema.Types.ObjectId,
+                  ref : 'User',
+                  required : true
+            },
+
+            createdBy : {
+                  type : mongoose.Schema.Types.ObjectId,
+                  ref : 'User',
+                  required : true
+            },
+            project: {
+                  type : mongoose.Schema.Types.ObjectId,
+                  ref : 'Project',
+                  required : true
+            },
+            
             dueDate : {
                   type : Date,
                   required : true,
