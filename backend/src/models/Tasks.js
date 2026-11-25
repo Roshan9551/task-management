@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
 
+import mongoose from 'mongoose';
 
 const taskSchema = new mongoose.Schema(
       {
@@ -73,4 +73,20 @@ const taskSchema = new mongoose.Schema(
       
 );
 
-export default mongoose.model('Task',taskSchema);
+// Index for retrieving tasks belonging to a project
+taskSchema.index({ project: 1 });
+
+// Automatically manage completedAt when status changes
+taskSchema.pre('save', function () {
+  if (this.isModified('status')) {
+    if (this.status === 'completed') {
+      this.completedAt = this.completedAt || new Date();
+    } else {
+      this.completedAt = null;
+    }
+  }
+});
+
+const Task = mongoose.model('Task', taskSchema);
+
+export default Task;
