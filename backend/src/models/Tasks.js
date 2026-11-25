@@ -35,6 +35,37 @@ const taskSchema = new mongoose.Schema(
             type : Date,
             default : null
       },
+      project : {
+            type : mongoose.Schema.Types.ObjectId,
+            ref : 'Project',
+            required : true
+      },
+      assignees : [
+            {
+                  type : mongoose.Schema.Types.ObjectId,
+                  ref : 'User',
+                  required : true
+            }
+      ],
+      assignmentHistory : [ {
+            action : {
+                  type : String,
+                  enum : ['ASSIGNED','REASSIGNED','UNASSIGNED'],
+                  required : true
+            },
+            userId : {
+                  type : mongoose.Schema.Types.ObjectId,
+                  ref : 'User',
+                  required : true
+            },
+            createdBy : {
+                  type : mongoose.Schema.Types.ObjectId,
+                  ref : 'User',
+                  required : true
+            },
+            changed
+      }]
+
 },
 {
             timestamps : true,
