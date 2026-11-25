@@ -1,62 +1,71 @@
+
 import mongoose from 'mongoose';
 
-
 const taskSchema = new mongoose.Schema(
-      {
-            title : {
-                  type : String,
-                  required : [true,'Title is required'],
-                  trim : true,
-                  minlength : 3,
-                  maxlength : 100
-            },
-            description: {
-                  type : String,
-                  required :true,
-                  trim : true,
-                  maxlength : 1000,
-            },
-            status : {
-                  type : String,
-                  enum : ['pending','in-progress','completed'],
-                  default : 'pending'
-            },
-            priority : {
-                  type : String,
-                  enum : ['low','medium','high'],
-                  default : 'medium'
-            },
-            assignedTo : {
-                  type : mongoose.Schema.Types.ObjectId,
-                  ref : 'User',
-                  required : true
-            },
+  {
+    title: {
+      type: String,
+      required: [true, 'Title is required'],
+      trim: true,
+      minlength: [3, 'Title must be at least 3 characters'],
+      maxlength: [100, 'Title cannot exceed 100 characters']
+    },
 
-            createdBy : {
-                  type : mongoose.Schema.Types.ObjectId,
-                  ref : 'User',
-                  required : true
-            },
-            project: {
-                  type : mongoose.Schema.Types.ObjectId,
-                  ref : 'Project',
-                  required : true
-            },
-            
-            dueDate : {
-                  type : Date,
-                  required : true,
-                  default : Date.now
-      },
-      completedAt : {
-            type : Date,
-            default : null
-      },
-},
-{
-            timestamps : true,
-      }
-      
+    description: {
+      type: String,
+      required: [true, 'Description is required'],
+      trim: true,
+      minlength: [3, 'Description must be at least 3 characters'],
+      maxlength: [1000, 'Description cannot exceed 1000 characters']
+    },
+
+    project: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Project',
+      required: [true, 'Task must belong to a project']
+    },
+
+    status: {
+      type: String,
+      enum: ['pending', 'in-progress', 'completed'],
+      default: 'pending'
+    },
+
+    priority: {
+      type: String,
+      enum: ['low', 'medium', 'high'],
+      default: 'medium'
+    },
+
+    dueDate: {
+      type: Date,
+      required: [true, 'Due date is required']
+    },
+
+    completedAt: {
+      type: Date,
+      default: null
+    }
+  },
+  {
+    timestamps: true
+  }
 );
 
-export default mongoose.model('Task',taskSchema);
+// Index for retrieving tasks belonging to a project
+taskSchema.index({ project: 1 });
+
+// Automatically manage completedAt when status changes
+taskSchema.pre('save', function () {
+  if (this.isModified('status')) {
+    if (this.status === 'completed') {
+      this.completedAt = this.completedAt || new Date();
+    } else {
+      this.completedAt = null;
+    }
+  }
+});
+
+const Task = mongoose.model('Task', taskSchema);
+
+export default Task;
